@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: banking_ai
+      POSTGRES_USER: banking_ai
+      POSTGRES_PASSWORD: banking_ai
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U banking_ai -d banking_ai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  banking-assistant:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/banking_ai
+      SPRING_DATASOURCE_USERNAME: banking_ai
+      SPRING_DATASOURCE_PASSWORD: banking_ai
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-dummy}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-dummy}
+      BANKING_ASSISTANT_API_KEY: ${BANKING_ASSISTANT_API_KEY:-dev-api-key}
+    ports:
+      - "8080:8080"

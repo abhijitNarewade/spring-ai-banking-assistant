@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-ai-banking-assistant
+  labels:
+    app: spring-ai-banking-assistant
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: spring-ai-banking-assistant
+  template:
+    metadata:
+      labels:
+        app: spring-ai-banking-assistant
+    spec:
+      containers:
+        - name: banking-assistant
+          image: ghcr.io/your-org/spring-ai-banking-assistant:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: banking-assistant-secrets
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
