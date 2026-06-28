@@ -79,14 +79,18 @@ docker compose up --build
 
 URLs:
 
-- API: `http://localhost:8080/api/v1`
-- Swagger: `http://localhost:8080/swagger-ui.html`
-- Health: `http://localhost:8080/actuator/health`
+- API: `http://localhost:18000/api/v1`
+- Swagger: `http://localhost:18000/swagger-ui.html`
+- Health: `http://localhost:18000/actuator/health`
+
+Docker Compose maps the app to host port `18000` and PostgreSQL to host port
+`5433` by default to avoid clashing with other local demos. Inside Compose, the
+application still listens on `8080` and connects to `postgres:5432`.
 
 ## Example Chat Request
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/assistant/chat \
+curl -X POST http://localhost:18000/api/v1/assistant/chat \
   -H "Content-Type: application/json" \
   -H "X-API-Key: dev-api-key" \
   -d '{
@@ -99,7 +103,7 @@ curl -X POST http://localhost:8080/api/v1/assistant/chat \
 ## Streaming Request
 
 ```bash
-curl -N -X POST http://localhost:8080/api/v1/assistant/chat/stream \
+curl -N -X POST http://localhost:18000/api/v1/assistant/chat/stream \
   -H "Content-Type: application/json" \
   -H "X-API-Key: dev-api-key" \
   -d '{
@@ -120,7 +124,7 @@ src/main/resources/banking-documents
 Ingest approved content:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/documents/ingest \
+curl -X POST http://localhost:18000/api/v1/documents/ingest \
   -H "Content-Type: application/json" \
   -H "X-API-Key: dev-api-key" \
   -d '{

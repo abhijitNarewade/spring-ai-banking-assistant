@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: banking_ai
       POSTGRES_PASSWORD: banking_ai
     ports:
-      - "5432:5432"
+      - "${BANKING_AI_POSTGRES_PORT:-5440}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U banking_ai -d banking_ai"]
       interval: 10s
@@ -26,4 +26,4 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-dummy}
       BANKING_ASSISTANT_API_KEY: ${BANKING_ASSISTANT_API_KEY:-dev-api-key}
     ports:
-      - "8080:8080"
+      - "${BANKING_AI_APP_PORT:-18000}:8080"
