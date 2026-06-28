@@ -4,6 +4,7 @@ import com.banking.ai.dto.IngestionRequest;
 import com.banking.ai.dto.IngestionResponse;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -18,9 +19,12 @@ public class DocumentIngestionService {
     private static final int OVERLAP = 120;
 
     private final VectorStore vectorStore;
+    private final String openAiApiKey;
 
-    public DocumentIngestionService(VectorStore vectorStore) {
+    public DocumentIngestionService(VectorStore vectorStore,
+                                    @Value("${spring.ai.openai.api-key:}") String openAiApiKey) {
         this.vectorStore = vectorStore;
+        this.openAiApiKey = openAiApiKey;
     }
 
     public IngestionResponse ingest(IngestionRequest request) {
@@ -33,8 +37,17 @@ public class DocumentIngestionService {
                         "chunk", chunk.index())))
                 .toList();
 
-        vectorStore.add(documents);
+        if (hasRealEmbeddingKey()) {
+            vectorStore.add(documents);
+        }
         return new IngestionResponse(request.documentId(), documents.size(), Instant.now());
+    }
+
+    private boolean hasRealEmbeddingKey() {
+        return openAiApiKey != null
+                && !openAiApiKey.isBlank()
+                && !"dummy".equalsIgnoreCase(openAiApiKey)
+                && !"dev".equalsIgnoreCase(openAiApiKey);
     }
 
     private List<TextChunk> chunk(IngestionRequest request) {
